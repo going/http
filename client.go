@@ -44,6 +44,10 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 	if headers != nil {
 		for key, v := range headers {
 			for _, val := range v {
+				if key == "Content-Type" {
+					req.Header.Set(key, val)
+					continue
+				}
 				req.Header.Add(key, val)
 			}
 		}
@@ -62,5 +66,8 @@ func (c *Client) GET(url string, headers map[string][]string) (*Response, error)
 }
 
 func (c *Client) POST(url string, headers map[string][]string, body io.Reader) (*Response, error) {
+	if _, ok := headers["Content-Type"]; !ok {
+		headers["Content-Type"] = []string{"application/x-www-form-urlencoded; param=value"}
+	}
 	return c.Do("POST", url, headers, body)
 }
