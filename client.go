@@ -28,12 +28,10 @@ func NewClient() *Client {
 }
 
 func NewProxyClient(proxy string) *Client {
-	jar, _ := cookiejar.New(nil)
 	proxyURL, _ := url.Parse(proxy)
 	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 	return &Client{
 		conn: &http.Client{
-			Jar:       jar,
 			Transport: transport,
 		},
 	}
@@ -44,6 +42,18 @@ func NewSession() *Client {
 	return &Client{
 		conn: &http.Client{
 			Jar: jar,
+		},
+	}
+}
+
+func NewProxySession() *Client {
+	proxyURL, _ := url.Parse(proxy)
+	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
+	jar, _ := cookiejar.New(nil)
+	return &Client{
+		conn: &http.Client{
+			Jar:       jar,
+			Transport: transport,
 		},
 	}
 }
