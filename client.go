@@ -46,7 +46,7 @@ func NewSession() *Client {
 	}
 }
 
-func NewProxySession() *Client {
+func NewProxySession(proxy string) *Client {
 	proxyURL, _ := url.Parse(proxy)
 	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 	jar, _ := cookiejar.New(nil)
