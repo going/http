@@ -12,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 )
 
 type status int
@@ -23,6 +24,18 @@ type Client struct {
 func NewClient() *Client {
 	return &Client{
 		conn: new(http.Client),
+	}
+}
+
+func NewProxyClient(proxy string) *Client {
+	jar, _ := cookiejar.New(nil)
+	proxyURL, _ := url.Parse(proxy)
+	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
+	return &Client{
+		conn: &http.Client{
+			Jar:       jar,
+			Transport: transport,
+		},
 	}
 }
 
