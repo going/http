@@ -13,12 +13,15 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"sync"
 )
 
 type status int
 
 type Client struct {
-	conn *http.Client
+	sync.Mutex
+	conn    *http.Client
+	session http.Header
 }
 
 func NewClient() *Client {
@@ -43,6 +46,7 @@ func NewSession() *Client {
 		conn: &http.Client{
 			Jar: jar,
 		},
+		session: make(http.Header),
 	}
 }
 
@@ -55,6 +59,7 @@ func NewProxySession(proxy string) *Client {
 			Jar:       jar,
 			Transport: transport,
 		},
+		session: make(http.Header),
 	}
 }
 
@@ -63,18 +68,22 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 	if checkError(err) {
 		return nil, err
 	}
+	c.Lock()
+	defer c.Unlock()
 
 	if headers != nil {
 		for key, v := range headers {
 			for _, val := range v {
 				if key == "Content-Type" {
-					req.Header.Set(key, val)
+					c.session.Set(key, val)
 					continue
 				}
-				req.Header.Add(key, val)
+				c.session.Add(key, val)
 			}
 		}
 	}
+
+	req.Header = c.session
 
 	resp, err := c.conn.Do(req)
 	if checkError(err) {
