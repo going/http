@@ -80,7 +80,7 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 			}
 		}
 
-		for key, val := range c.session {
+		for key, v := range c.session {
 			for _, val := range v {
 				req.Header.Set(key, val)
 			}
