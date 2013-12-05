@@ -71,19 +71,28 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 	c.Lock()
 	defer c.Unlock()
 
-	if headers != nil {
-		for key, v := range headers {
-			for _, val := range v {
-				if key == "Content-Type" {
+	if c.session == nil {
+		if headers != nil {
+			for key, v := range headers {
+				for _, val := range v {
 					c.session.Set(key, val)
-					continue
 				}
-				c.session.Add(key, val)
+			}
+		}
+
+		for key, val := range c.session {
+			req.Header.Set(key, val)
+		}
+
+	} else {
+		if headers != nil {
+			for key, v := range headers {
+				for _, val := range v {
+					req.Header.Set(key, val)
+				}
 			}
 		}
 	}
-
-	req.Header = c.session
 
 	resp, err := c.conn.Do(req)
 	if checkError(err) {
