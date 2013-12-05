@@ -89,6 +89,9 @@ func (c *Client) GET(url string, headers map[string][]string) (*Response, error)
 }
 
 func (c *Client) POST(url string, headers map[string][]string, body io.Reader) (*Response, error) {
+	if headers == nil {
+		headers = make(map[string][]string)
+	}
 	if _, ok := headers["Content-Type"]; !ok {
 		headers["Content-Type"] = []string{"application/x-www-form-urlencoded; param=value"}
 	}
