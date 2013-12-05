@@ -81,7 +81,9 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 		}
 
 		for key, val := range c.session {
-			req.Header.Set(key, val)
+			for _, val := range v {
+				req.Header.Set(key, val)
+			}
 		}
 
 	} else {
