@@ -113,7 +113,7 @@ func (c *Client) POST(url string, headers map[string][]string, body io.Reader) (
 		headers = make(map[string][]string)
 	}
 	if _, ok := headers["Content-Type"]; !ok {
-		headers["Content-Type"] = []string{"application/x-www-form-urlencoded; param=value"}
+		headers["Content-Type"] = []string{"application/x-www-form-urlencoded"}
 	}
 	return c.Do("POST", url, headers, body)
 }
