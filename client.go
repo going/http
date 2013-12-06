@@ -20,13 +20,13 @@ type status int
 
 type Client struct {
 	sync.Mutex
-	conn    *http.Client
+	Conn    *http.Client
 	session http.Header
 }
 
 func NewClient() *Client {
 	return &Client{
-		conn: new(http.Client),
+		Conn: new(http.Client),
 	}
 }
 
@@ -34,7 +34,7 @@ func NewProxyClient(proxy string) *Client {
 	proxyURL, _ := url.Parse(proxy)
 	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 	return &Client{
-		conn: &http.Client{
+		Conn: &http.Client{
 			Transport: transport,
 		},
 	}
@@ -43,7 +43,7 @@ func NewProxyClient(proxy string) *Client {
 func NewSession() *Client {
 	jar, _ := cookiejar.New(nil)
 	return &Client{
-		conn: &http.Client{
+		Conn: &http.Client{
 			Jar: jar,
 		},
 		session: make(http.Header),
@@ -55,7 +55,7 @@ func NewProxySession(proxy string) *Client {
 	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 	jar, _ := cookiejar.New(nil)
 	return &Client{
-		conn: &http.Client{
+		Conn: &http.Client{
 			Jar:       jar,
 			Transport: transport,
 		},
@@ -96,7 +96,7 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 		}
 	}
 
-	resp, err := c.conn.Do(req)
+	resp, err := c.Conn.Do(req)
 	if checkError(err) {
 		return nil, err
 	}
