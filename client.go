@@ -71,7 +71,7 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 	c.Lock()
 	defer c.Unlock()
 
-	if c.session == nil {
+	if c.session != nil {
 		if headers != nil {
 			for key, v := range headers {
 				for _, val := range v {
@@ -86,12 +86,12 @@ func (c *Client) Do(method, url string, headers map[string][]string, body io.Rea
 			}
 		}
 
-	} else {
-		if headers != nil {
-			for key, v := range headers {
-				for _, val := range v {
-					req.Header.Set(key, val)
-				}
+	}
+
+	if headers != nil {
+		for key, v := range headers {
+			for _, val := range v {
+				req.Header.Set(key, val)
 			}
 		}
 	}
