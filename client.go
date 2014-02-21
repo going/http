@@ -47,10 +47,21 @@ func NewClient() *Client {
 
 func NewProxyClient(proxy string) *Client {
 	proxyURL, _ := url.Parse(proxy)
-	transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 	return &Client{
 		Conn: &http.Client{
-			Transport: transport,
+			Transport: &http.Transport{
+				Dial: func(network, addr string) (net.Conn, error) {
+					deadline := time.Now().Add(5 * time.Second)
+					conn, err := net.DialTimeout(network, addr, 5*time.Second)
+					if err != nil {
+						return nil, err
+					}
+					conn.SetDeadline(deadline)
+					return conn, nil
+				},
+				Proxy: http.ProxyURL(proxyURL),
+				ResponseHeaderTimeout: 5 * time.Second,
+			},
 		},
 	}
 }
@@ -59,6 +70,18 @@ func NewSession() *Client {
 	jar, _ := cookiejar.New(nil)
 	return &Client{
 		Conn: &http.Client{
+			Transport: &http.Transport{
+				Dial: func(network, addr string) (net.Conn, error) {
+					deadline := time.Now().Add(5 * time.Second)
+					conn, err := net.DialTimeout(network, addr, 5*time.Second)
+					if err != nil {
+						return nil, err
+					}
+					conn.SetDeadline(deadline)
+					return conn, nil
+				},
+				ResponseHeaderTimeout: 5 * time.Second,
+			},
 			Jar: jar,
 		},
 		session: make(http.Header),
@@ -71,8 +94,20 @@ func NewProxySession(proxy string) *Client {
 	jar, _ := cookiejar.New(nil)
 	return &Client{
 		Conn: &http.Client{
-			Jar:       jar,
-			Transport: transport,
+			Jar: jar,
+			Transport: &http.Transport{
+				Dial: func(network, addr string) (net.Conn, error) {
+					deadline := time.Now().Add(5 * time.Second)
+					conn, err := net.DialTimeout(network, addr, 5*time.Second)
+					if err != nil {
+						return nil, err
+					}
+					conn.SetDeadline(deadline)
+					return conn, nil
+				},
+				Proxy: http.ProxyURL(proxyURL),
+				ResponseHeaderTimeout: 5 * time.Second,
+			},
 		},
 		session: make(http.Header),
 	}
