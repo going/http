@@ -96,8 +96,8 @@ func NewProxySession(proxy string) *Client {
 			Jar: jar,
 			Transport: &http.Transport{
 				Dial: func(network, addr string) (net.Conn, error) {
-					deadline := time.Now().Add(5 * time.Second)
-					conn, err := net.DialTimeout(network, addr, 5*time.Second)
+					deadline := time.Now().Add(60 * time.Second)
+					conn, err := net.DialTimeout(network, addr, 60*time.Second)
 					if err != nil {
 						return nil, err
 					}
@@ -105,7 +105,7 @@ func NewProxySession(proxy string) *Client {
 					return conn, nil
 				},
 				Proxy: http.ProxyURL(proxyURL),
-				ResponseHeaderTimeout: 5 * time.Second,
+				ResponseHeaderTimeout: 60 * time.Second,
 			},
 		},
 		session: make(http.Header),
