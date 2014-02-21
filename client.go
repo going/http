@@ -10,10 +10,12 @@ package httplib
 
 import (
 	"io"
+	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 	"sync"
+	"time"
 )
 
 type status int
@@ -26,7 +28,20 @@ type Client struct {
 
 func NewClient() *Client {
 	return &Client{
-		Conn: new(http.Client),
+		Conn: &http.Client{
+			Transport: &http.Transport{
+				Dial: func(network, addr string) (net.Conn, error) {
+					deadline := time.Now().Add(5 * time.Second)
+					conn, err := net.DialTimeout(network, addr, 5*time.Second)
+					if err != nil {
+						return nil, err
+					}
+					conn.SetDeadline(deadline)
+					return conn, nil
+				},
+				ResponseHeaderTimeout: 5 * time.Second,
+			},
+		},
 	}
 }
 
